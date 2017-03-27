@@ -1,5 +1,6 @@
-from pyactor.context import set_context, create_host, sleep, shutdown, interval, later
+from pyactor.context import set_context, create_host, sleep, shutdown, interval, later, serve_forever
 from collections import defaultdict
+import random
 class Tracker(object):
     _ask = ['get_peers']
     _tell = ['announce','check_peers', 'get_all_peers','init_start','stop_interval','tim']
@@ -10,12 +11,12 @@ class Tracker(object):
         self.peers[torrent_hash][peer_ref] = 0
 
     def get_peers(self,torrent_hash):
+        #return random.sample(self.peers[torrent_hash].keys(),3)
         return self.peers[torrent_hash].keys()
-     
         
     def init_start(self):
         self.interval1=interval(self.host,1,self.proxy,"tim","aa")
-        #later(5, self.proxy, "stop_interval")
+        
         
     def tim(self,param):
         for key in self.peers.keys():
@@ -45,11 +46,7 @@ if __name__ == "__main__":
     tracker = h.spawn('tracker',Tracker)
     tracker.init_start()
     tracker.announce('1235','peer 3')
-    while True:
-    	tracker.announce('1234','peer 1')
-    	tracker.announce('1234','peer 2') 	
-	sleep(4)
-        print tracker.get_peers('1234')
+    
         
         
     

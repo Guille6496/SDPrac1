@@ -16,42 +16,35 @@ class Peer(object):
 	    return None
      
     def init_start(self):        
-	self.interval_getPeers=interval(self.host,2,self.proxy,"getPeers",)
 	self.interval_announce=interval(self.host,10,self.proxy,"announce",)
-        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","pull")
+	self.interval_getPeers=interval(self.host,2,self.proxy,"getPeers",)
+        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","push")
   
     def announce(self):
         tracker.announce(file_name,url)
 	print 'Announced'
 
     
-    def gossipCycle(self,typ):     
-        if typ == "push":  ## push
-            self.p=random.sample(self.peers,1)
-            if self.p != url and self.p != url_seed:
-	        self.p=self.p+'/peer'
-                peerid=h.lookup_url(self.p,'Peer','peer')
+    def gossipCycle(self,typ):
+        p=random.sample(self.peers,1)
+        p=p[0]     
+        if typ == "push":  ## push            
+            if p != url:
+	        p=p+'/peer'
+                peerid=h.lookup_url(p,'Peer','peer')
 	        ran=randint(0,8)
-                if not self.chunks[ran] == '_':
+                if not peerid.get_state():
 	            peerid.push(ran,self.chunks[ran])
                 
         else:			#pull
-            if self.p != url:
-                self.p=self.p+'/peer'
-               	peerid=h.lookup_url(self.p,'Peer','peer')
+            if p != url:
+                p=p+'/peer'
+               	peerid=h.lookup_url(p,'Peer','peer')
 		ran=randint(0,8)
                 chun=peerid.pull(ran) 
                 if not chun == None:   
 		    self.chunks[ran]=chun
                     print self.chunks
-
-
-        if not '_' in self.chunks:
-            self.interval_getPeers.set()
-            self.interval_announce.set()
-            self.interval_gossipCycle.set()              
-	    print 'File downloaded'
-	    print 'Press Ctrl+C to stop'
             
 		
 	    	
@@ -68,7 +61,6 @@ if __name__ == "__main__":
     tracker = h.lookup_url('http://127.0.0.1:1277/tracker','Tracker','tracker') 
     peer.init_start()
    
-    peer.gossipCycle("push")
  
     serve_forever()
   

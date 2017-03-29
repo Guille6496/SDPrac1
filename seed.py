@@ -35,16 +35,6 @@ class Peer(object):
 	        ran=randint(0,8)
                 if not peerid.get_state():
 	            peerid.push(ran,self.chunks[ran])
-                
-        else:			#pull
-            if p != url:
-                p=p+'/peer'
-               	peerid=h.lookup_url(p,'Peer','peer')
-		ran=randint(0,8)
-                chun=peerid.pull(ran) 
-                if not chun == None:   
-		    self.chunks[ran]=chun
-                    print self.chunks
             
 		
 	    	

@@ -10,7 +10,7 @@ class Peer(object):
     downloaded=False
     def push(self,chunk_id,chunk_data):
         if self.chunks[chunk_id] == '_':
-           self.chunks[chunk_id]=chunk_data
+           self.chunks[chunk_id]=chunk_data          
 	   print self.chunks
     def pull(self,chunk_id):
         if not self.chunks[chunk_id] == '_':
@@ -27,12 +27,12 @@ class Peer(object):
     def init_start(self):        
 	self.interval_getPeers=interval(self.host,2,self.proxy,"getPeers",)
 	self.interval_announce=interval(self.host,10,self.proxy,"announce",)
-        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","push")
-    def gossipCycle(self,typ):     
-        if typ == "push":  ## push
-            p=random.sample(self.peers,1)
-            p=p[0]
-            if p != url and p != url_seed:
+        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","pull")
+    def gossipCycle(self,typ):    
+        p=random.sample(self.peers,1)
+        p=p[0] 
+        if typ == "push":  ## push            
+            if p != url and p != url_seed:               #to do: while fins que trobi un peer que no sigui ell ni el seed
 	        p=p+'/peer'
                 peerid=h.lookup_url(p,'Peer','peer')
 	        ran=randint(0,8)
@@ -40,7 +40,7 @@ class Peer(object):
                     if not self.chunks[ran] == '_':
 	                peerid.push(ran,self.chunks[ran])
                 
-        else:			#pull
+        elif not self.downloaded:			#pull
             if p != url:
                 p=p+'/peer'
                	peerid=h.lookup_url(p,'Peer','peer')
@@ -48,6 +48,7 @@ class Peer(object):
                 chun=peerid.pull(ran) 
                 if not chun == None:   
 		    self.chunks[ran]=chun
+                    print 'Pull from: '+p
                     print self.chunks
 
 
@@ -69,38 +70,7 @@ if __name__ == "__main__":
     peer = h.spawn('peer',Peer)
     tracker = h.lookup_url('http://127.0.0.1:1277/tracker','Tracker','tracker') 
     peer.init_start()
-   # sleep(3)
-   # peer.gossipCycle("push") 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    serve_forever()
-  
-  
-  
-  
-  
-  
-  
-  
-  
+    serve_forever()  
   
   
   

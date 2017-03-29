@@ -24,10 +24,10 @@ class Peer(object):
         self.peers=tracker.get_peers(file_name)
         
          
-    def init_start(self):        
-	self.interval_getPeers=interval(self.host,2,self.proxy,"getPeers",)
+    def init_start(self):
 	self.interval_announce=interval(self.host,10,self.proxy,"announce",)
-        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","pull")
+	self.interval_getPeers=interval(self.host,2,self.proxy,"getPeers",)
+        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle",str(sys.argv[2]))
     def gossipCycle(self,typ):    
         p=random.sample(self.peers,1)
         p=p[0] 

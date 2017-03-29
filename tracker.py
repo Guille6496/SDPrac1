@@ -11,8 +11,10 @@ class Tracker(object):
         self.peers[torrent_hash][peer_ref] = 0
 
     def get_peers(self,torrent_hash):
-        #return random.sample(self.peers[torrent_hash].keys(),3)
-        return self.peers[torrent_hash].keys()
+        if len(self.peers[torrent_hash].keys()) >=3 :
+            return random.sample(self.peers[torrent_hash].keys(),3)
+        else:
+            return self.peers[torrent_hash].keys()
         
     def init_start(self):
         self.interval1=interval(self.host,1,self.proxy,"tim","aa")

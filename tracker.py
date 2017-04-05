@@ -33,7 +33,7 @@ class Tracker(object):
     def check_peers(self):
         for key in self.peers.keys():
             for peer in self.peers[key].keys():
-                if self.peers[key][peer] >= 10:
+                if self.peers[key][peer] > 10:
                     del self.peers[key][peer]
                     print "peer deleted"
                     
@@ -46,10 +46,5 @@ if __name__ == "__main__":
     set_context()
     h = create_host('http://127.0.0.1:1277')
     tracker = h.spawn('tracker',Tracker)
-    tracker.init_start()
-    tracker.announce('1235','peer 3')
-    
-        
-        
-    
+    tracker.init_start()   
     serve_forever()

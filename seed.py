@@ -26,9 +26,19 @@ class Peer(object):
 
     
     def gossipCycle(self,typ):
+        i=0
         p=random.sample(self.peers,1)
-        p=p[0]     
-        if typ == "push":  ## push            
+        p=p[0]
+        found=False
+        while not found and i<10:  
+            print 'a'         
+            p=random.sample(self.peers,1)
+            p=p[0] 
+            if p != url:
+                found=True
+            i+=1 
+        if typ == "push":  ## push    
+            print p        
             if p != url:
 	        p=p+'/peer'
                 peerid=h.lookup_url(p,'Peer','peer')

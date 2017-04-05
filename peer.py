@@ -51,20 +51,18 @@ class Peer(object):
                 if p != self.url and p != url_seed:
                     found=True
                 i+=1                   
-            peerid=h.lookup(p)
-           
-	    #if not peerid.get_state():
+            peerid=h.lookup(p)           
+	    
             i=0
-            found=False;
-            while i<len(self.chunks) and not found:
+	    found=False;
+	    while i<len(self.chunks) and not found:
                 ran=randint(0,8)
-                if self.chunks[ran] != '_' :
-                    found=True             
-	            peerid.push(ran,self.chunks[ran])
-                i+=1
-                
+	        if self.chunks[ran] != '_' :
+	      	    found=True             
+		    peerid.push(ran,self.chunks[ran])
+	        i+=1
+        
         if (typ =="pull" or typ=="pushpull") and (not self.downloaded and not self.url=="seed"):			#pull
-            
             found=False
             i=0
             while i<10 and not found:
@@ -77,7 +75,7 @@ class Peer(object):
                	peerid=h.lookup(p)
 		found=False
                 while i<len(self.chunks) and not found:
-		    ran=randint(0,8)
+	 	    ran=randint(0,8)
                     if self.chunks[ran] == '_':
                         found=True
                         chun=peerid.pull(ran) 
@@ -113,14 +111,13 @@ if __name__ == "__main__":
     seed.init_start()
     seed.set('seed')   
 
-
-
-    peer = h.spawn('peer1',Peer)
-    peer.init_start()
-    peer.set('peer1')
+    for i in range(0,20):
+        peer = h.spawn('peer'+str(i),Peer)
+        peer.init_start()
+        peer.set('peer'+str(i))
     
     
-    peer2 = h.spawn('peer2',Peer)
+    """peer2 = h.spawn('peer2',Peer)
     peer2.init_start()
     peer2.set('peer2')
     
@@ -132,7 +129,7 @@ if __name__ == "__main__":
     peer4.init_start()
     peer4.set('peer4')
     
-  
+    """
     serve_forever()  
   
   

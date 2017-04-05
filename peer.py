@@ -1,5 +1,6 @@
 from pyactor.context import set_context, create_host, sleep, shutdown, interval, later, serve_forever
 from random import randint
+from pyactor.exceptions import TimeoutError
 import sys
 import time
 import random
@@ -39,7 +40,7 @@ class Peer(object):
     def init_start(self):
 	self.interval_announce=interval(self.host,10,self.proxy,"announce",)
 	self.interval_getPeers=interval(self.host,2,self.proxy,"getPeers",)
-        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","pushpull")
+        self.interval_gossipCycle=interval(self.host,1,self.proxy,"gossipCycle","pull")
 
     def gossipCycle(self,typ):        
         if typ == "push" or typ == "pushpull":  ## push     
@@ -50,9 +51,11 @@ class Peer(object):
                 p=p[0]
                 if p != self.url and p != url_seed:
                     found=True
-                i+=1                   
-            peerid=h.lookup(p)           
-	    
+                i+=1
+            try:                   
+                peerid=h.lookup(p)           
+	    except TimeoutError:
+                print ""
             i=0
 	    found=False;
 	    while i<len(self.chunks) and not found:
@@ -74,17 +77,21 @@ class Peer(object):
             if p != self.url:
                	peerid=h.lookup(p)
 		found=False
+                chun=None
                 while i<len(self.chunks) and not found:
 	 	    ran=randint(0,8)
                     if self.chunks[ran] == '_':
                         found=True
-                        chun=peerid.pull(ran) 
+                        try:
+                            chun=peerid.pull(ran) 
+                        except TimeoutError:
+                            print ""
                 if not chun == None:   
 		    self.chunks[ran]=chun
                     
 
 
-
+        print self.url," ",self.chunks
         if not '_' in self.chunks and self.url != "seed" and not self.downloaded:
            self.downloaded=True
            print 'File ',self.url," downloaded ",self.chunks
@@ -93,9 +100,9 @@ class Peer(object):
 
     def announce(self):
         tracker.announce(file_name,self.url)      
-        if not self.downloaded:
+        """if not self.downloaded:
             print self.url," status ",self.chunks
-            print '-------------------'
+            print '-------------------'"""
 	
 
 if __name__ == "__main__":
@@ -111,7 +118,7 @@ if __name__ == "__main__":
     seed.init_start()
     seed.set('seed')   
 
-    for i in range(0,20):
+    for i in range(0,4):
         peer = h.spawn('peer'+str(i),Peer)
         peer.init_start()
         peer.set('peer'+str(i))
